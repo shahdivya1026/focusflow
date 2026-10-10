@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  totalHours  Float?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CalendarEvent {
+  id        Int      @id @default(autoincrement())
+  date      String
+  title     String
+  type      String   @default("Note")
+  time      String?
+  createdAt DateTime @default(now())
+
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FocusSession {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  duration  Int
+  createdAt DateTime @default(now())
+
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String    @unique
+  password       String
+  profilePicture String?
+  accountType    String    @default("Student")
+  createdAt      DateTime  @default(now())
+  lastLogin      DateTime?
+  isActive       Boolean   @default(true)
+  tasks          Task[]
+  calendarEvents CalendarEvent[]
+  focusSessions  FocusSession[]
+}
